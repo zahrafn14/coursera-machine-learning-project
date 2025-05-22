@@ -1,0 +1,92 @@
+---
+title: "Coursera Practical Machine Learning"
+author: "Zahra Fitriana"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+library(caret)
+library(randomForest)
+library(rpart)
+library(ggplot2)
+library(dplyr)
+
+```{r data-prep}
+# Load data
+train_url <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+test_url <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+
+train_data <- read.csv(train_url, na.strings = c("NA", "", "#DIV/0!"))
+test_data <- read.csv(test_url, na.strings = c("NA", "", "#DIV/0!"))
+
+# Remove near-zero variance predictors
+nzv <- nearZeroVar(train_data)
+train_data <- train_data[, -nzv]
+
+# Remove columns with too many NAs (keep columns with no NAs)
+train_data <- train_data[, colSums(is.na(train_data)) == 0]
+
+# Remove ID and timestamps columns (first 5)
+train_data <- train_data[, -(1:5)]
+
+# Make sure 'classe' is a factor
+train_data$classe <- factor(train_data$classe)
+
+# Apply some cleaning steps to test_data
+test_data <- test_data[, names(test_data) %in% names(train_data)]
+# test_data should not contain 'classe' column
+test_data <- test_data[, names(train_data)[names(train_data) != "classe"]]
+
+# Check final columns
+print(paste("Number of columns in training data", ncol(train_data)))
+print(paste("Number of columns in test data", ncol(test_data)))
+
+```{r train_model}
+set.seed(123)
+
+# Split data into training and validation sets
+inTrain <- createDataPartition(train_data$classe, p=0.7, list = FALSE)
+train_set <- train_data[inTrain, ]
+validation_set <- train_data[-inTrain, ]
+
+# Train Random Forest model with 5-fold CV
+control <- trainControl(method = "cv", number = 5)
+rf_model <- train(classe ~ ., data = train_set, method = "rf", trControl = control)
+
+print(rf_model)
+
+```{r predict-evaluate}
+# Predict on validation set
+predictions <- predict(rf_model, validation_set)
+
+# Make sure factors have the same levels
+levels_all <- union(levels(predictions), levels(validation_set$classe))
+predictions <- factor(predictions, levels = levels_all)
+validation_set$classe <- factor(validation_set$classe, levels = levels_all)
+
+# Confusion matrix
+cm <- confusionMatrix(predictions, validation_set$classe)
+print(cm)
+
+# Compute and print error rate
+error_rate <- 1 - cm$overall["Accuracy"]
+print(paste("Validation error rate:", round(error_rate, 4)))
+
+```{r final-predictions}
+# Predict on test data (no classe column
+final_predictions <- predict(rf_model, test_data)
+
+print(final_predictions)
+
+```{r save-predictions, echo=TRUE}
+# Save 20 predictions into separate text files for Coursera quiz
+
+pml_write_files <- function(x){
+  n <- length(x)
+  for(i in 1:n){
+    filename <- paste0("problem_id_", i, ".txt")
+    write.table(x[i], file = filename, quote = FALSE, row.names = FALSE, col.names = FALSE)}
+}
+
+pml_write_files(final_predictions)
