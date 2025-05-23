@@ -76,8 +76,30 @@ This submission is the project of coursera assignment on Practical Machine learn
 
 `print(rf_model)`
 
+## **Model Accuracy**
+
+`predictions <- predict(modelRF, testSet)
+
+`confusionMatrix(predictions, testSet$classe)`
+
+### Accuracy
+
+Accuracy : 0.9962
+
+95% CI : (0.9934, 0.9979)
+
+Kappa : 0.9952
+
+## **Out-of-Sample Error Estimate**
+
+`1 - confusionMatrix(predictions, testSet$classe)$overall['Accuracy']`
+
 ## **Predict on test data** 
 
 `final_predictions <- predict(rf_model, test_data)`
 
 `print(final_predictions)`
+
+### Predicted Classes for Submission
+
+[1] B A B A A E D B A A B C B A E E A B B B
