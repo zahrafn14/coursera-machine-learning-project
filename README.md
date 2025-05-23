@@ -8,7 +8,7 @@ This submission is the project of coursera assignment on Practical Machine learn
 
 [Testing data] (https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv)
 
-### Load libraries and data
+## **Load libraries and data**
 
 `library(rpart)`
 
@@ -18,14 +18,14 @@ This submission is the project of coursera assignment on Practical Machine learn
 
 `set.seet(123)`
 
-## Load data
+### Load data
 `train_url <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"`
 
 `test_url <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"`
 
-train_data <- read.csv(train_url, na.strings = c("NA", "", "#DIV/0!"))
+`train_data <- read.csv(train_url, na.strings = c("NA", "", "#DIV/0!"))`
 
-test_data <- read.csv(test_url, na.strings = c("NA", "", "#DIV/0!"))
+`test_data <- read.csv(test_url, na.strings = c("NA", "", "#DIV/0!"))`
 
 ## **Data Cleaning**
 ### Remove near-zero variance predictors
