@@ -28,39 +28,39 @@ train_data <- read.csv(train_url, na.strings = c("NA", "", "#DIV/0!"))
 test_data <- read.csv(test_url, na.strings = c("NA", "", "#DIV/0!"))
 
 ## **Data Cleaning**
-# Remove near-zero variance predictors
+### Remove near-zero variance predictors
 
 `nzv <- nearZeroVar(train_data)`
 
 `train_data <- train_data[, -nzv]`
 
-# Remove columns with too many NAs (keep columns with no NAs)
+### Remove columns with too many NAs (keep columns with no NAs)
 
 `train_data <- train_data[, colSums(is.na(train_data)) == 0]`
 
-# Remove ID and timestamps columns (first 5)
+### Remove ID and timestamps columns (first 5)
 
 `train_data <- train_data[, -(1:5)]`
 
-# Make sure 'classe' is a factor
+### Make sure 'classe' is a factor
 
 `train_data$classe <- factor(train_data$classe)`
 
-# Apply some cleaning steps to test_data
+### Apply some cleaning steps to test_data
 
 `test_data <- test_data[, names(test_data) %in% names(train_data)]`
 
-# test_data should not contain 'classe' column
+### test_data should not contain 'classe' column
 
 `test_data <- test_data[, names(train_data)[names(train_data) != "classe"]]`
 
-# Check final columns
+### Check final columns
 
 `print(paste("Number of columns in training data", ncol(train_data)))`
 
 ## **Partition the Training Set**
 
-# Split data into training and validation sets
+### Split data into training and validation sets
 
 `inTrain <- createDataPartition(training$classe, p = 0.7, list = FALSE)`
 
@@ -68,7 +68,7 @@ test_data <- read.csv(test_url, na.strings = c("NA", "", "#DIV/0!"))
 
 `validation_set <- train_data[-inTrain, ]`
 
-# Train Random Forest model with 5-fold CV
+### Train Random Forest model with 5-fold CV
 
 `control <- trainControl(method + "cv", number = 5)`
 
